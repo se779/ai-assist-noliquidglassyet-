@@ -1,4 +1,8 @@
 use tauri::{Manager, App, WebviewWindow};
+#[cfg(target_os = "macos")]
+use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial};
+#[cfg(target_os = "windows")]
+use window_vibrancy::apply_acrylic;
 
 // The offset from the top of the screen to the window
 const TOP_OFFSET: i32 = 54;
@@ -15,6 +19,11 @@ pub fn setup_main_window(app: &mut App) -> Result<(), Box<dyn std::error::Error>
         .ok_or("No window found")?;
     
     position_window_top_center(&window, TOP_OFFSET)?;
+
+    #[cfg(target_os = "macos")]
+    let _ = apply_vibrancy(&window, NSVisualEffectMaterial::HudWindow, None, None);
+    #[cfg(target_os = "windows")]
+    let _ = apply_acrylic(&window, Some((18, 18, 18, 125)));
     
     Ok(())
 }
